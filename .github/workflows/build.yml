@@ -94,23 +94,39 @@ jobs:
     
     - name: Debug - List downloaded files
       run: |
-        echo "Files in artifacts:"
-        find artifacts -type f || echo "No files found"
-        ls -la artifacts/ || echo "Directory empty"
+        echo "=== Files in artifacts ==="
+        find artifacts -type f
+        echo "=== Directory structure ==="
+        tree artifacts || ls -laR artifacts
     
     - name: Prepare release files
       run: |
         mkdir -p release
         
+        find artifacts -name "*.lib" -exec cp {} release/justcwl.lib \;
         find artifacts -name "*.dll" -exec cp {} release/justcwl.dll \;
+        find artifacts -name "*.exe" -exec cp {} release/test.exe \;
+        find artifacts -name "*.pdb" -exec cp {} release/test.pdb \;
         
-        echo "Release files:"
+        echo "=== Release files ==="
         ls -la release/
+        
+        if [ ! -f "release/justcwl.lib" ]; then
+          echo "ERROR: justcwl.lib not found!"
+          exit 1
+        fi
+        
+        if [ ! -f "release/test.exe" ]; then
+          echo "ERROR: test.exe not found!"
+          exit 1
+        fi
     
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
-        files: release/*
-        fail_on_unmatched_files: false
+        files: |
+          release/justcwl.lib
+          release/test.exe
+        fail_on_unmatched_files: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
