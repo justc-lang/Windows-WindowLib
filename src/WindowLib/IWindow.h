@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <windows.h>
+#include <memory>
 
 namespace WindowLib {
 
