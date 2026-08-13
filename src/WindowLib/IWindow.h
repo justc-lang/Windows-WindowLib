@@ -21,12 +21,12 @@ class IWindow {
 public:
     virtual ~IWindow() = default;
     
-    virtual bool Create(const WindowConfig& config) = 0;
-    virtual void Show() = 0;
+    virtual bool Create(const WindowConfig& config, const bool& debug = false) = 0;
+    virtual void Show(const bool& debug = false) = 0;
     virtual void Hide() = 0;
-    virtual void Close() = 0;
+    virtual void Close(const bool& debug = false) = 0;
     virtual bool IsRunning() const = 0;
-    virtual void RunMessageLoop() = 0;
+    virtual void RunMessageLoop(const bool& debug = false) = 0;
     virtual void SetTitle(const std::wstring& title) = 0;
     virtual void SetSize(int width, int height) = 0;
     
