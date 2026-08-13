@@ -1,23 +1,15 @@
 #include <windows.h>
 #include <iostream>
+#include <memory>
 #include "WindowLib/IWindow.h"
-#include "App.xaml.h"
 
 using namespace WindowLib;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
-    bool useWinUI = true;
-    
-    std::unique_ptr<IWindow> window;
-    
-    if (useWinUI) {
-        window = CreateWinUIWindow();
-    } else {
-        window = CreateClassicWindow();
-    }
+    auto window = CreateClassicWindow();
     
     if (!window) {
-        MessageBox(nullptr, L"Failed to create window", L"Error", MB_OK);
+        MessageBox(nullptr, L"Failed to create window instance", L"Error", MB_OK);
         return 1;
     }
     
@@ -26,6 +18,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     config.width = 800;
     config.height = 600;
     config.hInstance = hInstance;
+    config.resizable = true;
+    config.maximized = false;
     
     if (!window->Create(config)) {
         MessageBox(nullptr, L"Failed to create window", L"Error", MB_OK);
@@ -33,8 +27,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     }
     
     window->OnResize([](int width, int height) {
-        OutputDebugString((L"Resized: " + std::to_wstring(width) + 
-                          L"x" + std::to_wstring(height) + L"\n").c_str());
+        wchar_t buffer[256];
+        swprintf_s(buffer, L"Resized: %dx%d\n", width, height);
+        OutputDebugString(buffer);
     });
     
     window->OnClose([]() {

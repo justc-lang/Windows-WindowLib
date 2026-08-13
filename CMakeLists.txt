@@ -13,7 +13,9 @@ add_compile_definitions(
     _WIN32_WINNT=0x0A00
 )
 
-find_package(windows-sdk REQUIRED)
+if(MSVC)
+    add_compile_options(/EHsc /bigobj)
+endif()
 
 add_subdirectory(src/WindowLib)
 add_subdirectory(src/TestApp)

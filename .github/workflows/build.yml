@@ -15,8 +15,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: recursive
     
     - name: Setup CMake
       uses: jwlawson/actions-setup-cmake@v2
@@ -28,9 +26,7 @@ jobs:
     
     - name: Configure CMake
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
-              -DCMAKE_GENERATOR_PLATFORM=x64 `
-              -DCMAKE_SYSTEM_VERSION=10.0.19041.0
+        cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -A x64
     
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}} --parallel
@@ -43,3 +39,4 @@ jobs:
           build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.dll
           build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.lib
           build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.exe
+          build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.pdb
