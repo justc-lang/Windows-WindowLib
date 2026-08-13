@@ -30,7 +30,7 @@ set(SOURCES
     ClassicWindow.h
 )
 
-add_library(WindowLib SHARED ${SOURCES})
+add_library(WindowLib STATIC ${SOURCES})
 
 target_include_directories(WindowLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

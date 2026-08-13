@@ -43,10 +43,3 @@ target_compile_options(TestApp PRIVATE
     /std:c++17
     /W4
 )
-
-add_custom_command(TARGET TestApp POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:WindowLib>
-        $<TARGET_FILE_DIR:TestApp>
-    COMMENT "Copying WindowLib.dll to TestApp directory"
-)
