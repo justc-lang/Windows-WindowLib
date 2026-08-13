@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-2022
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.28'
+    
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Configure CMake
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} `
+              -DCMAKE_GENERATOR_PLATFORM=x64 `
+              -DCMAKE_SYSTEM_VERSION=10.0.19041.0
+    
+    - name: Build
+      run: cmake --build build --config ${{env.BUILD_TYPE}} --parallel
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: WindowLib-${{env.BUILD_TYPE}}
+        path: |
+          build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.dll
+          build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.lib
+          build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.exe
