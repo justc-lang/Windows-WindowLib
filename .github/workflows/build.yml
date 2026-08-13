@@ -26,6 +26,7 @@ on:
   push:
     branches: [ main, develop ]
     tags:
+      - 'v*'
   release:
     types: [published, edited]
 
@@ -66,28 +67,54 @@ jobs:
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}} --parallel
     
+    - name: List build output
+      run: |
+        dir /s build\src
+    
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: WindowLib-${{env.BUILD_TYPE}}
         path: |
-          build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.dll
-          build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.lib
-          build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.exe
-          build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.pdb
+          build/src/WindowLib/${{env.BUILD_TYPE}}/*.dll
+          build/src/WindowLib/${{env.BUILD_TYPE}}/*.lib
+          build/src/TestApp/${{env.BUILD_TYPE}}/*.exe
+          build/src/TestApp/${{env.BUILD_TYPE}}/*.pdb
+        if-no-files-found: error
 
   release-assets:
     if: github.event_name == 'release'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
     steps:
-    - uses: actions/download-artifact@v4
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
       with:
+        name: WindowLib-${{env.BUILD_TYPE}}
         path: artifacts
-    - run: |
-        mkdir release
-        cp artifacts/WindowLib/Release/WindowLib.lib release/justcwl.lib
-    - uses: softprops/action-gh-release@v2
+    
+    - name: Debug - List downloaded files
+      run: |
+        echo "Files in artifacts:"
+        find artifacts -type f || echo "No files found"
+        ls -la artifacts/ || echo "Directory empty"
+    
+    - name: Prepare release files
+      run: |
+        mkdir -p release
+        
+        find artifacts -name "*.dll" -exec cp {} release/justcwl.dll \;
+        
+        echo "Release files:"
+        ls -la release/
+    
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
       with:
-        files: |
-          release/*
+        files: release/*
+        fail_on_unmatched_files: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
