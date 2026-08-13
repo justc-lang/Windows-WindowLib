@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "../WindowLib/pch.h"
 #include "App.xaml.h"
 #include "MainWindow.xaml.h"
 

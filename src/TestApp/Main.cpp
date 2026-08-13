@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <iostream>
 #include <memory>
-#include "WindowLib/IWindow.h"
+#include "../WindowLib/IWindow.h"
 
 using namespace WindowLib;
 

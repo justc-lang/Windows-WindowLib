@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "../WindowLib/pch.h"
 #include "MainWindow.xaml.h"
 
 using namespace winrt;
