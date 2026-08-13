@@ -67,10 +67,6 @@ jobs:
     - name: Build
       run: cmake --build build --config ${{env.BUILD_TYPE}} --parallel
     
-    - name: List build output
-      run: |
-        dir /s build\src
-    
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
