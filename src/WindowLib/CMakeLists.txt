@@ -32,8 +32,50 @@ target_compile_options(WindowLib PRIVATE
 target_compile_definitions(WindowLib PRIVATE
     WINRT_LEAN_AND_MEAN
     _CRT_SECURE_NO_WARNINGS
+    UNICODE
+    _UNICODE
 )
 
 if(MSVC)
-    target_compile_options(WindowLib PRIVATE /ZW)
+    get_filename_component(WINDOWS_SDK_DIR "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v10.0;InstallationFolder]" ABSOLUTE CACHE)
+    
+    if(NOT WINDOWS_SDK_DIR)
+        set(WINDOWS_SDK_DIR "$ENV{WindowsSdkDir}")
+    endif()
+    
+    if(WINDOWS_SDK_DIR)
+        file(GLOB WINDOWS_SDK_VERSIONS RELATIVE "${WINDOWS_SDK_DIR}/Include/" "${WINDOWS_SDK_DIR}/Include/*")
+        list(SORT WINDOWS_SDK_VERSIONS)
+        list(REVERSE WINDOWS_SDK_VERSIONS)
+        
+        foreach(VERSION ${WINDOWS_SDK_VERSIONS})
+            if(VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$")
+                set(WINDOWS_SDK_VERSION ${VERSION})
+                break()
+            endif()
+        endforeach()
+        
+        if(WINDOWS_SDK_VERSION)
+            set(WINDOWS_SDK_REF_PATH "${WINDOWS_SDK_DIR}/References/${WINDOWS_SDK_VERSION}")
+            
+            target_compile_options(WindowLib PRIVATE 
+                "/AI${WINDOWS_SDK_REF_PATH}"
+                "/AI${WINDOWS_SDK_DIR}/UnionMetadata/${WINDOWS_SDK_VERSION}"
+            )
+            
+            target_link_directories(WindowLib PRIVATE
+                "${WINDOWS_SDK_DIR}/Lib/${WINDOWS_SDK_VERSION}/um/x64"
+                "${WINDOWS_SDK_DIR}/Lib/${WINDOWS_SDK_VERSION}/ucrt/x64"
+            )
+            
+            message(STATUS "Windows SDK found at: ${WINDOWS_SDK_DIR}")
+            message(STATUS "Windows SDK version: ${WINDOWS_SDK_VERSION}")
+        endif()
+    endif()
+    
+    set_source_files_properties(
+        pch.cpp
+        WinUIWindow.cpp
+        PROPERTIES COMPILE_FLAGS "/ZW"
+    )
 endif()
