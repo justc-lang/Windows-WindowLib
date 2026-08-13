@@ -2,33 +2,24 @@ set(SOURCES
     Main.cpp
 )
 
-set(XAML_FILES
-    App.xaml
-    MainWindow.xaml
-)
-
-add_executable(TestApp WIN32 ${SOURCES} ${XAML_FILES})
+add_executable(TestApp WIN32 ${SOURCES})
 
 target_link_libraries(TestApp
     WindowLib
     user32
     kernel32
-    ole32
-    runtimeobject
-    windowsapp
-)
-
-target_compile_options(TestApp PRIVATE 
-    /EHsc 
-    /std:c++17
-    /ZW
-    /W4
 )
 
 target_compile_definitions(TestApp PRIVATE
     UNICODE
     _UNICODE
-    WINRT_LEAN_AND_MEAN
+    WIN32_LEAN_AND_MEAN
+)
+
+target_compile_options(TestApp PRIVATE 
+    /EHsc 
+    /std:c++17
+    /W4
 )
 
 add_custom_command(TARGET TestApp POST_BUILD

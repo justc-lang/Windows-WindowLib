@@ -3,12 +3,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Microsoft.UI.Xaml.h>
-#include <winrt/Microsoft.UI.Xaml.Controls.h>
-#include <winrt/Microsoft.UI.Xaml.Window.h>
-#include <winrt/Microsoft.UI.Xaml.Media.h>
-#include <winrt/Microsoft.UI.Windowing.h>
 #include <memory>
 #include <string>
 #include <functional>

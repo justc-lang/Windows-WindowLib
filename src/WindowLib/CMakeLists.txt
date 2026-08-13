@@ -6,8 +6,6 @@ set(SOURCES
     IWindow.h
     ClassicWindow.cpp
     ClassicWindow.h
-    WinUIWindow.cpp
-    WinUIWindow.h
 )
 
 add_library(WindowLib SHARED ${SOURCES})
