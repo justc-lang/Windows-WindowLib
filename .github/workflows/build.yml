@@ -76,6 +76,7 @@ jobs:
           build/src/WindowLib/${{env.BUILD_TYPE}}/*.lib
           build/src/TestApp/${{env.BUILD_TYPE}}/*.exe
           build/src/TestApp/${{env.BUILD_TYPE}}/*.pdb
+          src/WindowLib/IWindow.h
         if-no-files-found: error
 
   release-assets:
@@ -107,6 +108,7 @@ jobs:
         find artifacts -name "*.dll" -exec cp {} release/justcwl.dll \;
         find artifacts -name "*.exe" -exec cp {} release/test.exe \;
         find artifacts -name "*.pdb" -exec cp {} release/test.pdb \;
+        find artifacts -name "*.h" -exec cp {} release/IWindow.h \;
         
         echo "=== Release files ==="
         ls -la release/
@@ -120,6 +122,11 @@ jobs:
           echo "ERROR: test.exe not found!"
           exit 1
         fi
+        
+        if [ ! -f "release/IWindow.h" ]; then
+          echo "ERROR: IWindow.h not found!"
+          exit 1
+        fi
     
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
@@ -127,6 +134,7 @@ jobs:
         files: |
           release/justcwl.lib
           release/test.exe
+          release/IWindow.h
         fail_on_unmatched_files: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
