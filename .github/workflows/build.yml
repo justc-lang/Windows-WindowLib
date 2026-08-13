@@ -86,8 +86,7 @@ jobs:
         path: artifacts
     - run: |
         mkdir release
-        cp artifacts/**/*.dll release/ || true
-        cp artifacts/**/*.lib release/ || true
+        cp artifacts/WindowLib/Release/WindowLib.lib release/justcwl.lib
     - uses: softprops/action-gh-release@v2
       with:
         files: |
