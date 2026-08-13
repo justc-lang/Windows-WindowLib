@@ -27,6 +27,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    add_compile_options(/MT$<$<CONFIG:Debug>:d>)
+endif()
+
 add_compile_definitions(
     WIN32_LEAN_AND_MEAN
     _CRT_SECURE_NO_WARNINGS
