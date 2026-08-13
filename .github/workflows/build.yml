@@ -74,3 +74,20 @@ jobs:
           build/src/WindowLib/${{env.BUILD_TYPE}}/WindowLib.lib
           build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.exe
           build/src/TestApp/${{env.BUILD_TYPE}}/TestApp.pdb
+
+  release-assets:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+    - run: |
+        mkdir release
+        cp artifacts/**/*.dll release/ || true
+        cp artifacts/**/*.lib release/ || true
+    - uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          release/*
