@@ -55,7 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         
         OutputDebugString(L"Creating window...\n");
         
-        if (!window->Create(config)) {
+        if (!window->Create(config, true)) {
             ShowError(L"Failed to create window");
             return 1;
         }
@@ -74,11 +74,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         
         OutputDebugString(L"Showing window...\n");
         
-        window->Show();
+        window->Show(true);
         
         OutputDebugString(L"Starting message loop...\n");
         
-        window->RunMessageLoop();
+        window->RunMessageLoop(true);
         
         OutputDebugString(L"Application terminated normally\n");
         

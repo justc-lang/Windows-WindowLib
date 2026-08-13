@@ -11,12 +11,12 @@ public:
     ClassicWindow();
     ~ClassicWindow() override;
     
-    bool Create(const WindowConfig& config) override;
-    void Show() override;
+    bool Create(const WindowConfig& config, const bool& debug = false) override;
+    void Show(const bool& debug = false) override;
     void Hide() override;
-    void Close() override;
+    void Close(const bool& debug = false) override;
     bool IsRunning() const override;
-    void RunMessageLoop() override;
+    void RunMessageLoop(const bool& debug = false) override;
     void SetTitle(const std::wstring& title) override;
     void SetSize(int width, int height) override;
     
@@ -27,7 +27,7 @@ public:
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, const bool& debug = false);
     
     HWND m_hwnd = nullptr;
     bool m_running = false;

@@ -12,7 +12,7 @@ ClassicWindow::~ClassicWindow() {
     Close();
 }
 
-bool ClassicWindow::Create(const WindowConfig& config) {
+bool ClassicWindow::Create(const WindowConfig& config, const bool& debug) {
     m_config = config;
     
     HINSTANCE hInstance = config.hInstance ? config.hInstance : GetModuleHandle(nullptr);
@@ -69,12 +69,12 @@ bool ClassicWindow::Create(const WindowConfig& config) {
         DWORD error = GetLastError();
         wchar_t msg[256];
         swprintf_s(msg, L"CreateWindowEx failed. Error: %d", error);
-        OutputDebugString(msg);
+        if (debug) OutputDebugString(msg);
         return false;
     }
     
     if (!IsWindow(m_hwnd)) {
-        OutputDebugString(L"Window created but IsWindow returns false!");
+        if (debug) OutputDebugString(L"Window created but IsWindow returns false!");
         return false;
     }
     
@@ -84,18 +84,18 @@ bool ClassicWindow::Create(const WindowConfig& config) {
         ShowWindow(m_hwnd, SW_MAXIMIZE);
     }
     
-    OutputDebugString(L"Window created successfully\n");
+    if (debug) OutputDebugString(L"Window created successfully\n");
     return true;
 }
 
-void ClassicWindow::Show() {
+void ClassicWindow::Show(const bool& debug) {
     if (m_hwnd && IsWindow(m_hwnd)) {
         ShowWindow(m_hwnd, SW_SHOW);
         UpdateWindow(m_hwnd);
         m_running = true;
-        OutputDebugString(L"Window shown\n");
+        if (debug) OutputDebugString(L"Window shown\n");
     } else {
-        OutputDebugString(L"Show() called with invalid window handle\n");
+        if (debug) OutputDebugString(L"Show() called with invalid window handle\n");
     }
 }
 
@@ -105,9 +105,9 @@ void ClassicWindow::Hide() {
     }
 }
 
-void ClassicWindow::Close() {
+void ClassicWindow::Close(const bool& debug) {
     if (m_hwnd && IsWindow(m_hwnd)) {
-        OutputDebugString(L"Closing window\n");
+        if (debug) OutputDebugString(L"Closing window\n");
         DestroyWindow(m_hwnd);
         m_hwnd = nullptr;
     }
@@ -118,22 +118,22 @@ bool ClassicWindow::IsRunning() const {
     return m_running;
 }
 
-void ClassicWindow::RunMessageLoop() {
+void ClassicWindow::RunMessageLoop(const bool& debug) {
     m_running = true;
     MSG msg = {};
     
-    OutputDebugString(L"Starting message loop\n");
+    if (debug) OutputDebugString(L"Starting message loop\n");
     
     while (m_running) {
         BOOL result = GetMessage(&msg, nullptr, 0, 0);
         
         if (result == -1) {
-            OutputDebugString(L"GetMessage error\n");
+            if (debug) OutputDebugString(L"GetMessage error\n");
             break;
         }
         
         if (result == 0) {
-            OutputDebugString(L"WM_QUIT received\n");
+            if (debug) OutputDebugString(L"WM_QUIT received\n");
             m_running = false;
             break;
         }
@@ -142,7 +142,7 @@ void ClassicWindow::RunMessageLoop() {
         DispatchMessage(&msg);
     }
     
-    OutputDebugString(L"Message loop ended\n");
+    if (debug) OutputDebugString(L"Message loop ended\n");
 }
 
 void ClassicWindow::SetTitle(const std::wstring& title) {
@@ -192,10 +192,10 @@ LRESULT CALLBACK ClassicWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, L
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, const bool& debug) {
     switch (msg) {
         case WM_CREATE: {
-            OutputDebugString(L"WM_CREATE received\n");
+            if (debug) OutputDebugString(L"WM_CREATE received\n");
             return 0;
         }
         
@@ -209,7 +209,7 @@ LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         
         case WM_CLOSE: {
-            OutputDebugString(L"WM_CLOSE received\n");
+            if (debug) OutputDebugString(L"WM_CLOSE received\n");
             if (m_closeCallback) {
                 m_closeCallback();
             }
@@ -218,7 +218,7 @@ LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         
         case WM_DESTROY: {
-            OutputDebugString(L"WM_DESTROY received\n");
+            if (debug) OutputDebugString(L"WM_DESTROY received\n");
             m_running = false;
             PostQuitMessage(0);
             return 0;
