@@ -26,10 +26,6 @@ jobs:
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
-
-    - name: Restore NuGet Packages
-      run: |
-        nuget restore build/src/WindowLib/WindowLib.vcxproj -PackagesDirectory packages
     
     - name: Configure CMake
       run: |
