@@ -1,0 +1,7 @@
+{
+  "name": "justc-windowlib",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "microsoft-cppwinrt"
+  ]
+}
