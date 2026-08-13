@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.28)
+
 set(SOURCES
     pch.h
     pch.cpp
@@ -9,6 +11,12 @@ set(SOURCES
 )
 
 add_library(WindowLib SHARED ${SOURCES})
+
+if(MSVC)
+    set_target_properties(WindowLib PROPERTIES
+        VS_PACKAGE_REFERENCES "Microsoft.Windows.CppWinRT_2.0.240405.15;Microsoft.WindowsAppSDK_1.5.240607001"
+    )
+endif()
 
 target_include_directories(WindowLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
