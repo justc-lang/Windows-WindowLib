@@ -72,10 +72,4 @@ if(MSVC)
             message(STATUS "Windows SDK version: ${WINDOWS_SDK_VERSION}")
         endif()
     endif()
-    
-    set_source_files_properties(
-        pch.cpp
-        WinUIWindow.cpp
-        PROPERTIES COMPILE_FLAGS "/ZW"
-    )
 endif()
