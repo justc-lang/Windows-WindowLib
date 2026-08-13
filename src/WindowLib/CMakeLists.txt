@@ -12,17 +12,6 @@ set(SOURCES
 
 add_library(WindowLib SHARED ${SOURCES})
 
-if(MSVC)
-    set_target_properties(WindowLib PROPERTIES
-        VS_PACKAGE_REFERENCES "Microsoft.Windows.CppWinRT_2.0.240405.15;Microsoft.WindowsAppSDK_1.5.240607001"
-    )
-
-    set_target_properties(WindowLib PROPERTIES
-        VS_GLOBAL_TargetFramework "native"
-        VS_GLOBAL_AssetTargetFallback "native"
-    )
-endif()
-
 target_include_directories(WindowLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(WindowLib
