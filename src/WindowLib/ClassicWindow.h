@@ -34,7 +34,7 @@ private:
     ResizeCallback m_resizeCallback;
     CloseCallback m_closeCallback;
     WindowConfig m_config;
-    std::wstring m_className = L"ClassicWindowClass";
+    std::wstring m_className;
     bool m_classRegistered = false;
 };
 
