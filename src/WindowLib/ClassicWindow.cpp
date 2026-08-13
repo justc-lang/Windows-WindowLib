@@ -1,5 +1,7 @@
-#include "pch.h"
 #include "ClassicWindow.h"
+#include <windowsx.h>
+#include <string>
+#include <sstream>
 
 namespace WindowLib {
 
@@ -12,18 +14,25 @@ ClassicWindow::~ClassicWindow() {
 bool ClassicWindow::Create(const WindowConfig& config) {
     m_config = config;
     
+    HINSTANCE hInstance = config.hInstance ? config.hInstance : GetModuleHandle(nullptr);
+    
     if (!m_classRegistered) {
         WNDCLASSEX wc = {};
         wc.cbSize = sizeof(WNDCLASSEX);
         wc.style = CS_HREDRAW | CS_VREDRAW;
         wc.lpfnWndProc = WindowProc;
-        wc.hInstance = config.hInstance ? config.hInstance : GetModuleHandle(nullptr);
+        wc.hInstance = hInstance;
         wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wc.lpszClassName = m_className.c_str();
         
         if (!RegisterClassEx(&wc)) {
-            return false;
+            DWORD error = GetLastError();
+            if (error != ERROR_CLASS_ALREADY_EXISTS) {
+                std::wstring msg = L"Failed to register window class. Error: " + std::to_wstring(error);
+                MessageBox(nullptr, msg.c_str(), L"Error", MB_OK | MB_ICONERROR);
+                return false;
+            }
         }
         m_classRegistered = true;
     }
@@ -34,23 +43,32 @@ bool ClassicWindow::Create(const WindowConfig& config) {
     }
     
     RECT rect = {0, 0, m_config.width, m_config.height};
-    AdjustWindowRect(&rect, style, FALSE);
+    if (!AdjustWindowRect(&rect, style, FALSE)) {
+        DWORD error = GetLastError();
+        std::wstring msg = L"Failed to adjust window rect. Error: " + std::to_wstring(error);
+        MessageBox(nullptr, msg.c_str(), L"Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
     
     m_hwnd = CreateWindowEx(
         0,
         m_className.c_str(),
         m_config.title.c_str(),
         style,
-        m_config.x, m_config.y,
+        m_config.x, 
+        m_config.y,
         rect.right - rect.left,
         rect.bottom - rect.top,
         nullptr,
         nullptr,
-        GetModuleHandle(nullptr),
+        hInstance,
         this
     );
     
     if (!m_hwnd) {
+        DWORD error = GetLastError();
+        std::wstring msg = L"Failed to create window. Error: " + std::to_wstring(error);
+        MessageBox(nullptr, msg.c_str(), L"Error", MB_OK | MB_ICONERROR);
         return false;
     }
     
@@ -65,6 +83,7 @@ void ClassicWindow::Show() {
     if (m_hwnd) {
         ShowWindow(m_hwnd, SW_SHOW);
         UpdateWindow(m_hwnd);
+        m_running = true;
     }
 }
 
@@ -75,7 +94,7 @@ void ClassicWindow::Hide() {
 }
 
 void ClassicWindow::Close() {
-    if (m_hwnd) {
+    if (m_hwnd && IsWindow(m_hwnd)) {
         DestroyWindow(m_hwnd);
         m_hwnd = nullptr;
     }
@@ -89,20 +108,20 @@ bool ClassicWindow::IsRunning() const {
 void ClassicWindow::RunMessageLoop() {
     m_running = true;
     MSG msg = {};
-    while (m_running && GetMessage(&msg, nullptr, 0, 0)) {
+    while (m_running && GetMessage(&msg, nullptr, 0, 0) > 0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 }
 
 void ClassicWindow::SetTitle(const std::wstring& title) {
-    if (m_hwnd) {
+    if (m_hwnd && IsWindow(m_hwnd)) {
         SetWindowText(m_hwnd, title.c_str());
     }
 }
 
 void ClassicWindow::SetSize(int width, int height) {
-    if (m_hwnd) {
+    if (m_hwnd && IsWindow(m_hwnd)) {
         RECT rect = {0, 0, width, height};
         AdjustWindowRect(&rect, GetWindowLong(m_hwnd, GWL_STYLE), FALSE);
         SetWindowPos(m_hwnd, nullptr, 0, 0,
@@ -140,6 +159,11 @@ LRESULT CALLBACK ClassicWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, L
 
 LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
+        case WM_CREATE: {
+            OutputDebugString(L"Window created successfully\n");
+            return 0;
+        }
+        
         case WM_SIZE: {
             int width = LOWORD(lParam);
             int height = HIWORD(lParam);
@@ -152,9 +176,8 @@ LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         case WM_CLOSE: {
             if (m_closeCallback) {
                 m_closeCallback();
-            } else {
-                DestroyWindow(m_hwnd);
             }
+            DestroyWindow(m_hwnd);
             return 0;
         }
         
