@@ -211,14 +211,14 @@ LRESULT CALLBACK ClassicWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, L
     
     pThis = reinterpret_cast<ClassicWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     
-    if (pThis && pThis->m_hwnd == hwnd) {
-        return pThis->HandleMessage(msg, wParam, lParam);
+    if (pThis) {
+        return pThis->HandleMessage(hwnd, msg, wParam, lParam);
     }
     
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, const bool& debug) {
+LRESULT ClassicWindow::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, const bool& debug) {
     switch (msg) {
         case WM_CREATE: {
             if (debug) OutputDebugString(L"WM_CREATE received\n");
@@ -251,7 +251,7 @@ LRESULT ClassicWindow::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, con
         }
         
         default:
-            return DefWindowProc(m_hwnd, msg, wParam, lParam);
+            return DefWindowProc(hwnd, msg, wParam, lParam);
     }
 }
 
