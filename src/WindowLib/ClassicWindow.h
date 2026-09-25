@@ -53,7 +53,7 @@ public:
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    LRESULT HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, const bool& debug = false);
+    LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, const bool& debug = false);
     
     HWND m_hwnd = nullptr;
     bool m_running = false;

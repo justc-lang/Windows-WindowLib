@@ -239,7 +239,7 @@ LRESULT ClassicWindow::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
             if (m_closeCallback) {
                 m_closeCallback();
             }
-            DestroyWindow(m_hwnd);
+            DestroyWindow(hwnd);
             return 0;
         }
         
